@@ -6,40 +6,36 @@ public class ConsultaMesas {
 
     public static final int RESERVAS = (10 * 14) + (5 * 20) + (10 * 5) + (10 * 6); // 350
 
-    //  resultado da distribuição otimizada
+    // Resultado da distribuição otimizada
     private static Distribuicao distribuicaoAtual;
 
-    // salva a distribuição otimizada
+    // Salva a distribuição otimizada
     public static void salvarDistribuicao(Distribuicao dist) {
         distribuicaoAtual = dist;
     }
 
-    // mostra as mesas disponíveis de acordo com o tipo
+    // Mostra as mesas disponíveis de acordo com o tipo
     public static void mostrarDistribuicaoPorTipo(int tipoMesa) {
         if (distribuicaoAtual == null) {
             System.out.println("Nenhuma distribuição disponível.");
             return;
         }
+        mostrarMesasDisponiveis(tipoMesa);
+    }
 
-        switch (tipoMesa) {
-            case 1:
-                int mesasDisp6 = TOTAL_MESAS_6 - distribuicaoAtual.mesas6;
-                System.out.println("Mesas de 6 lugares disponíveis: " + mesasDisp6);
-                System.out.println("Lugares disponíveis nesse tipo: " + (mesasDisp6 * 6));
-                break;
-            case 2:
-                int mesasDisp4 = TOTAL_MESAS_4 - distribuicaoAtual.mesas4;
-                System.out.println("Mesas de 4 lugares disponíveis: " + mesasDisp4);
-                System.out.println("Lugares disponíveis nesse tipo: " + (mesasDisp4 * 4));
-                break;
-            case 3:
-                int mesasDisp2 = TOTAL_MESAS_2 - distribuicaoAtual.mesas2;
-                System.out.println("Mesas de 2 lugares disponíveis: " + mesasDisp2);
-                System.out.println("Lugares disponíveis nesse tipo: " + (mesasDisp2 * 2));
-                break;
-            default:
-                System.out.println("Tipo inválido.");
-        }
+    // Método genérico para mostrar mesas disponíveis
+    private static void mostrarMesasDisponiveis(int tipoMesa) {
+        // Arrays que representam as mesas por tipo (6, 4, 2)
+        int[] mesas = {distribuicaoAtual.mesas6, distribuicaoAtual.mesas4, distribuicaoAtual.mesas2};
+        int[] totais = {TOTAL_MESAS_6, TOTAL_MESAS_4, TOTAL_MESAS_2};
+
+        // Calcula a quantidade de mesas e lugares disponíveis de acordo com o tipo
+        int mesasDisp = totais[tipoMesa - 1] - mesas[tipoMesa - 1];
+        int lugaresDisp = mesasDisp * (tipoMesa == 1 ? 6 : tipoMesa == 2 ? 4 : 2);
+
+        // Exibe as informações
+        System.out.println("Mesas de " + (tipoMesa == 1 ? "6" : tipoMesa == 2 ? "4" : "2") + " lugares disponíveis: " + mesasDisp);
+        System.out.println("Lugares disponíveis nesse tipo: " + lugaresDisp);
     }
 
     // Classe interna para guardar a melhor distribuição
@@ -48,16 +44,18 @@ public class ConsultaMesas {
         public int lugaresOcupados, lugaresRestando;
 
         public void imprimir() {
+            System.out.println("----------------------------------");
             System.out.println("Distribuição ideal:");
             System.out.println("- Mesas de 6 lugares: " + mesas6);
             System.out.println("- Mesas de 4 lugares: " + mesas4);
             System.out.println("- Mesas de 2 lugares: " + mesas2);
             System.out.println("Lugares ocupados: " + lugaresOcupados);
             System.out.println("Lugares sobrando: " + lugaresRestando);
+            System.out.println("----------------------------------");
         }
     }
 
-    // distribuição inteligente
+    // Distribuição inteligente
     public static Distribuicao distribuirInteligente(int lugares, int max6, int max4, int max2) {
         Distribuicao melhor = null;
 
@@ -68,22 +66,19 @@ public class ConsultaMesas {
                     int usados = m6 * 6 + m4 * 4 + m2 * 2;
                     int sobra = lugares - usados;
 
-                    if (sobra == 0) {
-                        if (melhor == null ||
-                                (m6 + m4 + m2) < (melhor.mesas6 + melhor.mesas4 + melhor.mesas2)) {
-                            melhor = new Distribuicao();
-                            melhor.mesas6 = m6;
-                            melhor.mesas4 = m4;
-                            melhor.mesas2 = m2;
-                            melhor.lugaresOcupados = usados;
-                            melhor.lugaresRestando = sobra;
-                        }
+                    // Se a distribuição for exata, verifica se é a melhor distribuição
+                    if (sobra == 0 && (melhor == null || (m6 + m4 + m2) < (melhor.mesas6 + melhor.mesas4 + melhor.mesas2))) {
+                        melhor = new Distribuicao();
+                        melhor.mesas6 = m6;
+                        melhor.mesas4 = m4;
+                        melhor.mesas2 = m2;
+                        melhor.lugaresOcupados = usados;
+                        melhor.lugaresRestando = sobra;
                     }
                 }
             }
         }
 
         return melhor;
-    } 
-    
+    }
 }
