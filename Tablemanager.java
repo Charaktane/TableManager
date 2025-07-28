@@ -1,4 +1,3 @@
-package tablemanager;
 
 import java.util.Scanner;
 
